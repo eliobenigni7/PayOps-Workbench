@@ -1,0 +1,13 @@
+employee_id,employee_name,team,period,gross_salary,previous_gross_salary,regular_hours,overtime_hours,bonus_amount,iban_present,salary_change_event,manual_override
+EMP-1001,Giulia Ferri,Sales,2026-09,3380,3350,168,4,0,true,false,false
+EMP-1002,Luca Conti,Operations,2026-09,2940,2940,168,2,0,true,false,false
+EMP-1003,Sara Romano,Engineering,2026-09,6140,4320,168,3,0,true,false,false
+EMP-1004,Marco Villa,Marketing,2026-09,3100,3100,168,1,0,false,false,false
+EMP-1005,Elena Moretti,Finance,2026-09,3860,3860,168,28,0,true,false,false
+EMP-1006,Andrea Greco,Sales,2026-09,3520,3520,168,2,2400,true,false,false
+EMP-1007,Chiara Riva,People,2026-09,3210,3210,168,0,0,true,false,false
+EMP-1008,Matteo Sala,Engineering,2026-09,4510,4480,168,5,0,true,true,false
+EMP-1009,Francesca Gallo,Operations,2026-09,2870,2870,168,3,0,true,false,true
+EMP-1010,Davide Bruno,Customer Success,2026-09,3040,3040,168,2,0,true,false,false
+EMP-1011,Alessia Marchetti,Operations,2026-09,2980,2980,168,1,0,false,false,false
+EMP-1012,Stefano Caruso,Engineering,2026-09,4650,4650,168,4,1200,true,false,true

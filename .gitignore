@@ -1,0 +1,27 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Local state
+.env
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated
+coverage/
+htmlcov/
