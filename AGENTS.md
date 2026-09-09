@@ -68,3 +68,31 @@ A reviewer can:
 - resolve the case manually;
 - see the structured resolution reflected in insights;
 - open a recurring issue and understand its estimated improvement opportunity.
+
+## Cursor Cloud specific instructions
+
+Current repository state: **pre-implementation scaffold**. It contains only specs/docs
+(`PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_PLAN.md`, per-app `README.md`s,
+`packages/domain/SCHEMA.md`), the design tokens at `apps/web/src/styles/tokens.css`, and the
+synthetic fixture `data/sample_payroll_batch.csv`. There is **no runnable application, no test
+suite, and no dependency manifests** yet (`apps/web` has no `package.json`; `apps/api` has no
+`requirements.txt`/`pyproject.toml`). As a result there is currently nothing to lint, test,
+build, or run — the next step is Phase 1 in `IMPLEMENTATION_PLAN.md`.
+
+Toolchain available on the VM (no install needed for these): Node v22 with `pnpm`/`npm`,
+Python 3.12 with `pip` and `venv`. `ruff`/`pytest` are not preinstalled and will arrive via the
+API's future dependency manifest.
+
+Startup/run guidance for future agents:
+
+- The update script auto-installs dependencies only once manifests exist: `pnpm install` in
+  `apps/web` when `apps/web/package.json` is present, and `pip install` for
+  `apps/api/requirements.txt` / `apps/api/pyproject.toml` when present. It is a safe no-op until
+  then, so adding a manifest is enough for the next session to install it automatically.
+- Do not add run/build commands to the update script. Once the apps exist, run the web dev server
+  and the FastAPI dev server manually (or via Docker Compose) — see `apps/web/README.md`,
+  `apps/api/README.md`, and `ARCHITECTURE.md` for the intended commands and routes rather than
+  duplicating them here.
+- Persistence is SQLite (`DATABASE_URL=sqlite:///./payroll_ops.db`) and the AI provider defaults
+  to `mock` (see `.env.example`), so no external services or secrets are required to run the app
+  locally.
