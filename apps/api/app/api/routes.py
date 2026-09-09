@@ -17,6 +17,8 @@ from app.domain.enums import (
     ISSUE_LABELS,
     OUTCOME_LABELS,
     REASON_LABELS,
+    RULE_LABELS,
+    EFFORT_LABELS,
     ImprovementStatus,
     IssueType,
     ReasonCode,
@@ -71,42 +73,42 @@ def _context_panel(case: ExceptionCase) -> dict:
     rows: list[dict] = []
     if case.issue_type in {IssueType.SALARY_DISCREPANCY.value, IssueType.MISSING_HR_EVENT.value}:
         rows = [
-            {"label": "Gross salary", "value": record.gross_salary, "format": "eur", "tone": "critical" if abs(delta_pct) >= 40 else "default"},
-            {"label": "Previous period", "value": record.previous_gross_salary, "format": "eur"},
-            {"label": "6m average", "value": record.avg_6m_gross, "format": "eur"},
-            {"label": "Difference", "value": delta_pct, "format": "pct", "tone": "critical" if abs(delta_pct) >= 30 else "default"},
+            {"label": "Retribuzione lorda", "value": record.gross_salary, "format": "eur", "tone": "critical" if abs(delta_pct) >= 40 else "default"},
+            {"label": "Periodo precedente", "value": record.previous_gross_salary, "format": "eur"},
+            {"label": "Media 6 mesi", "value": record.avg_6m_gross, "format": "eur"},
+            {"label": "Differenza", "value": delta_pct, "format": "pct", "tone": "critical" if abs(delta_pct) >= 30 else "default"},
         ]
     elif case.issue_type == IssueType.MISSING_BANK_INFORMATION.value:
         rows = [
-            {"label": "IBAN present", "value": "No", "tone": "critical"},
-            {"label": "Gross salary at risk", "value": record.gross_salary, "format": "eur"},
+            {"label": "IBAN presente", "value": "No", "tone": "critical"},
+            {"label": "Retribuzione a rischio", "value": record.gross_salary, "format": "eur"},
             {"label": "Team", "value": record.team},
         ]
     elif case.issue_type == IssueType.OVERTIME_ISSUE.value:
         rows = [
-            {"label": "Overtime hours", "value": record.overtime_hours, "tone": "critical"},
-            {"label": "Regular hours", "value": record.regular_hours},
-            {"label": "Review threshold", "value": 20},
+            {"label": "Ore straordinario", "value": record.overtime_hours, "tone": "critical"},
+            {"label": "Ore ordinarie", "value": record.regular_hours},
+            {"label": "Soglia di review", "value": 20},
         ]
     elif case.issue_type == IssueType.BONUS_ANOMALY.value:
         rows = [
-            {"label": "Bonus amount", "value": record.bonus_amount, "format": "eur", "tone": "high"},
-            {"label": "Gross salary", "value": record.gross_salary, "format": "eur"},
-            {"label": "Bonus / gross", "value": (record.bonus_amount / record.gross_salary * 100) if record.gross_salary else 0, "format": "pct"},
+            {"label": "Importo bonus", "value": record.bonus_amount, "format": "eur", "tone": "high"},
+            {"label": "Retribuzione lorda", "value": record.gross_salary, "format": "eur"},
+            {"label": "Bonus / lordo", "value": (record.bonus_amount / record.gross_salary * 100) if record.gross_salary else 0, "format": "pct"},
         ]
     elif case.issue_type == IssueType.DUPLICATE_RECORD.value:
         rows = [
-            {"label": "Employee", "value": record.employee_id},
-            {"label": "Period", "value": record.period},
-            {"label": "Gross salary", "value": record.gross_salary, "format": "eur"},
+            {"label": "Dipendente", "value": record.employee_id},
+            {"label": "Periodo", "value": record.period},
+            {"label": "Retribuzione lorda", "value": record.gross_salary, "format": "eur"},
         ]
     else:
         rows = [
-            {"label": "Manual override", "value": "Yes" if record.manual_override else "No"},
-            {"label": "Gross salary", "value": record.gross_salary, "format": "eur"},
+            {"label": "Override manuale", "value": "Sì" if record.manual_override else "No"},
+            {"label": "Retribuzione lorda", "value": record.gross_salary, "format": "eur"},
             {"label": "Bonus", "value": record.bonus_amount, "format": "eur"},
         ]
-    return {"title": "What changed", "rows": rows}
+    return {"title": "Cosa è cambiato", "rows": rows}
 
 
 def _investigation(item) -> dict:
@@ -141,8 +143,8 @@ def _opportunity_payload(item) -> dict:
         "measurement_kpis": json.loads(item.measurement_kpis_json),
         "expected_effort_removed_hours": item.expected_effort_removed_hours,
         "status": item.status,
-        "impact_label": "High impact" if item.expected_effort_removed_hours >= 3 else "Medium impact",
-        "effort_label": f"{item.implementation_effort.capitalize()} implementation effort",
+        "impact_label": "Impatto alto" if item.expected_effort_removed_hours >= 3 else "Impatto medio",
+        "effort_label": f"Effort di implementazione {EFFORT_LABELS.get(item.implementation_effort, item.implementation_effort)}",
     }
 
 
@@ -189,7 +191,7 @@ def batches(db: Session = Depends(get_db)) -> dict:
 def batch_summary(batch_id: str, db: Session = Depends(get_db)) -> dict:
     batch = db.get(Batch, batch_id)
     if batch is None:
-        raise HTTPException(status_code=404, detail="Batch not found")
+        raise HTTPException(status_code=404, detail="Batch non trovato")
     payload = dashboard_payload(db, batch)
     payload["ai_available"] = ai_service.available
     return payload
@@ -199,7 +201,7 @@ def batch_summary(batch_id: str, db: Session = Depends(get_db)) -> dict:
 def dashboard(batch_id: str | None = None, db: Session = Depends(get_db)) -> dict:
     batch = db.get(Batch, batch_id) if batch_id else latest_batch(db)
     if batch is None:
-        raise HTTPException(status_code=404, detail="No processed batch")
+        raise HTTPException(status_code=404, detail="Nessun batch processato")
     payload = dashboard_payload(db, batch)
     payload["ai_available"] = ai_service.available
     payload["batches"] = [
@@ -215,13 +217,13 @@ async def import_batch(file: UploadFile = File(...), db: Session = Depends(get_d
     raw = (await file.read()).decode("utf-8")
     reader = csv.DictReader(io.StringIO(raw))
     if not reader.fieldnames:
-        raise HTTPException(status_code=400, detail="CSV is missing a header row")
+        raise HTTPException(status_code=400, detail="Il CSV non ha una riga di intestazione")
     missing = [field for field in CSV_FIELDS if field not in reader.fieldnames]
     if missing:
-        raise HTTPException(status_code=400, detail=f"CSV is missing fields: {', '.join(missing)}")
+        raise HTTPException(status_code=400, detail=f"Nel CSV mancano i campi: {', '.join(missing)}")
     rows = list(reader)
     if not rows:
-        raise HTTPException(status_code=400, detail="CSV has no data rows")
+        raise HTTPException(status_code=400, detail="Il CSV non contiene righe di dati")
     period = rows[0].get("period") or datetime.utcnow().strftime("%Y-%m")
     batch = process_batch(db, rows, period=period, source=file.filename or "upload.csv")
     return {"batch_id": batch.id, "record_count": batch.record_count, "period": batch.period}
@@ -275,7 +277,7 @@ def exceptions(
 def exception_detail(exception_id: str, db: Session = Depends(get_db)) -> dict:
     case = get_exception(db, exception_id)
     if case is None:
-        raise HTTPException(status_code=404, detail="Exception not found")
+        raise HTTPException(status_code=404, detail="Eccezione non trovata")
     audits = list(
         db.scalars(
             select(AuditEvent)
@@ -308,6 +310,7 @@ def exception_detail(exception_id: str, db: Session = Depends(get_db)) -> dict:
             {
                 "rule_id": item.rule_id,
                 "severity": item.severity,
+                "label": RULE_LABELS.get(item.rule_id, item.rule_id),
                 "message": item.message,
                 "issue_type": item.issue_type,
                 "evidence": json.loads(item.evidence_json),
@@ -323,9 +326,9 @@ def exception_detail(exception_id: str, db: Session = Depends(get_db)) -> dict:
                 "type": "salary_change",
                 "present": record.salary_change_event,
                 "note": (
-                    "Compensation change recorded in the HR feed for this period."
+                    "Variazione retributiva presente nel flusso HR di questo periodo."
                     if record.salary_change_event
-                    else "No salary-change event found in the provided HR data."
+                    else "Nessun evento di cambio retribuzione nei dati HR forniti."
                 ),
             }
         ],
@@ -368,7 +371,7 @@ def resolve(exception_id: str, body: ResolveRequest, db: Session = Depends(get_d
             resolved_by=body.resolved_by,
         )
     except ReviewError as exc:
-        status = 404 if "not found" in str(exc).lower() else 409
+        status = 404 if "non trovata" in str(exc).lower() else 409
         raise HTTPException(status_code=status, detail=str(exc)) from exc
     return exception_detail(exception_id, db)
 
@@ -377,18 +380,18 @@ def resolve(exception_id: str, body: ResolveRequest, db: Session = Depends(get_d
 def investigate(exception_id: str, db: Session = Depends(get_db)) -> dict:
     case = get_exception(db, exception_id)
     if case is None:
-        raise HTTPException(status_code=404, detail="Exception not found")
+        raise HTTPException(status_code=404, detail="Eccezione non trovata")
     try:
         investigation = ai_service.investigate(db, case)
     except AIUnavailable as exc:
         return {
             "available": False,
             "reason": str(exc),
-            "disclaimer": "AI suggestions are informational only. Final resolution requires operator confirmation.",
+            "disclaimer": "I suggerimenti AI sono solo informativi. La risoluzione finale richiede conferma dell'operatore.",
         }
     return {
         "available": True,
-        "disclaimer": "AI suggestions are informational only. Final resolution requires operator confirmation.",
+        "disclaimer": "I suggerimenti AI sono solo informativi. La risoluzione finale richiede conferma dell'operatore.",
         "investigation": _investigation(investigation),
     }
 
@@ -412,7 +415,7 @@ def improvements(db: Session = Depends(get_db)) -> dict:
 def improvement_detail(opportunity_id: str, db: Session = Depends(get_db)) -> dict:
     item = get_opportunity(db, opportunity_id)
     if item is None:
-        raise HTTPException(status_code=404, detail="Opportunity not found")
+        raise HTTPException(status_code=404, detail="Opportunità non trovata")
     return _opportunity_payload(item)
 
 

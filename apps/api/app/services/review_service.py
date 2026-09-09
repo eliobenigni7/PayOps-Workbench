@@ -91,11 +91,11 @@ def resolve_exception(
 ) -> ExceptionCase:
     case = get_exception(db, exception_id)
     if case is None:
-        raise ReviewError("Exception not found")
+        raise ReviewError("Eccezione non trovata")
     if case.resolution is not None:
-        raise ReviewError("Exception already has a resolution")
+        raise ReviewError("L'eccezione ha già una risoluzione")
     if not resolved_by.strip():
-        raise ReviewError("resolved_by is required")
+        raise ReviewError("resolved_by è obbligatorio")
 
     now = resolved_at or datetime.utcnow()
     minutes = handling_minutes

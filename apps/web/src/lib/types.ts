@@ -82,6 +82,7 @@ export type ExceptionDetail = ExceptionListItem & {
   };
   triggered_rules: {
     rule_id: string;
+    label?: string;
     severity: string;
     message: string;
     issue_type: string;

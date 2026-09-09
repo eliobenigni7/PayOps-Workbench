@@ -11,7 +11,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(detail || `Request failed: ${response.status}`);
+    throw new Error(detail || `Richiesta fallita: ${response.status}`);
   }
   return response.json() as Promise<T>;
 }

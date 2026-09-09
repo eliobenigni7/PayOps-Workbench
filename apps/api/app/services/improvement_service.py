@@ -78,7 +78,7 @@ def get_opportunity(db: Session, opportunity_id: str) -> ImprovementOpportunity 
 def update_opportunity_status(db: Session, opportunity_id: str, status: ImprovementStatus) -> ImprovementOpportunity:
     item = db.get(ImprovementOpportunity, opportunity_id)
     if item is None:
-        raise ValueError("Opportunity not found")
+        raise ValueError("Opportunità non trovata")
     item.status = status.value
     db.flush()
     return item

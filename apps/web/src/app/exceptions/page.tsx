@@ -43,8 +43,8 @@ export default function QueuePage() {
 
   return (
     <AppShell
-      title="Review queue"
-      subtitle={`${items.length} open`}
+      title="Coda di review"
+      subtitle={`${items.length} aperti`}
       openCount={dashboard?.open_count}
       improvementCount={0}
     >
@@ -52,18 +52,18 @@ export default function QueuePage() {
         <input
           value={q}
           onChange={(event) => setQ(event.target.value)}
-          placeholder="Search records…"
+          placeholder="Cerca record…"
           className="h-10 w-64 rounded-lg border border-line bg-white px-3 text-sm"
         />
         <select className="h-10 rounded-lg border border-line bg-white px-3 text-sm" value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option value="">All priorities</option>
-          <option value="critical">Critical</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
+          <option value="">Tutte le priorità</option>
+          <option value="critical">Critico</option>
+          <option value="high">Alto</option>
+          <option value="medium">Medio</option>
+          <option value="low">Basso</option>
         </select>
         <select className="h-10 rounded-lg border border-line bg-white px-3 text-sm" value={issueType} onChange={(e) => setIssueType(e.target.value)}>
-          <option value="">All issue types</option>
+          <option value="">Tutti i tipi di problema</option>
           {(meta?.issue_types ?? []).map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
@@ -71,8 +71,8 @@ export default function QueuePage() {
           ))}
         </select>
         <select className="h-10 rounded-lg border border-line bg-white px-3 text-sm" value={assignee} onChange={(e) => setAssignee(e.target.value)}>
-          <option value="">All assignees</option>
-          <option value="unassigned">Unassigned</option>
+          <option value="">Tutti gli assegnatari</option>
+          <option value="unassigned">Non assegnato</option>
           {operators.map((name) => (
             <option key={name}>{name}</option>
           ))}

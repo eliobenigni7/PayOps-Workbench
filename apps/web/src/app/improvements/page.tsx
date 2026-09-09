@@ -19,7 +19,7 @@ export default function ImprovementsPage() {
   }, []);
 
   return (
-    <AppShell title="Improvement opportunities" subtitle="Fix the source of recurring review work" improvementCount={items.length}>
+    <AppShell title="Opportunità di miglioramento" subtitle="Sistemare la fonte del lavoro di review ricorrente" improvementCount={items.length}>
       {error ? <p className="text-sm text-[var(--critical)]">{error}</p> : null}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {items.map((item) => (
@@ -31,11 +31,11 @@ export default function ImprovementsPage() {
             <p className="mt-2 text-sm text-ink-650">{item.effort_label}</p>
             <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
               <div>
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500">Cases / month</dt>
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500">Casi / mese</dt>
                 <dd className="mt-1 text-lg font-bold">{item.monthly_occurrences}</dd>
               </div>
               <div>
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500">Handling</dt>
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500">Gestione</dt>
                 <dd className="mt-1 text-lg font-bold">{item.avg_handling_minutes}m</dd>
               </div>
               <div>

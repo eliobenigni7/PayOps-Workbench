@@ -14,6 +14,13 @@ def _pct(value: float | None) -> float | None:
     return round(value * 100, 1)
 
 
+def _pct_label(value: float | None) -> str | None:
+    pct = _pct(value)
+    if pct is None:
+        return None
+    return str(pct).replace(".", ",")
+
+
 def missing_iban(record: NormalizedRecord) -> RuleEvaluation:
     triggered = not record.iban_present
     return RuleEvaluation(
@@ -21,7 +28,7 @@ def missing_iban(record: NormalizedRecord) -> RuleEvaluation:
         triggered=triggered,
         severity=Severity.HIGH,
         issue_type=IssueType.MISSING_BANK_INFORMATION,
-        message="Bank details are missing — payment cannot be released without an IBAN.",
+        message="Mancano i dati bancari: il pagamento non può essere disposto senza IBAN.",
         evidence={"iban_present": record.iban_present},
     )
 
@@ -31,11 +38,11 @@ def salary_variation(record: NormalizedRecord) -> RuleEvaluation:
     triggered = ratio is not None and ratio >= 0.30
     severity = Severity.CRITICAL if (ratio or 0) >= 0.40 else Severity.HIGH
     pct = _pct(ratio)
-    direction = "increased" if record.salary_delta > 0 else "decreased"
+    direction = "aumentata" if record.salary_delta > 0 else "diminuita"
     message = (
-        f"Gross salary {direction} {pct}% versus the previous period."
+        f"La retribuzione lorda è {direction} del {_pct_label(ratio)}% rispetto al periodo precedente."
         if triggered
-        else "Salary variation is within the 30% review threshold."
+        else "La variazione retributiva è entro la soglia di review del 30%."
     )
     return RuleEvaluation(
         rule_id="SALARY_VARIATION",
@@ -63,9 +70,9 @@ def missing_salary_event(record: NormalizedRecord) -> RuleEvaluation:
         severity=severity,
         issue_type=IssueType.MISSING_HR_EVENT,
         message=(
-            "No salary-change HR event found to support the pay change."
+            "Nessun evento HR di cambio retribuzione a supporto della variazione."
             if triggered
-            else "Salary change is supported by an HR event or is within tolerance."
+            else "La variazione retributiva è supportata da un evento HR o è entro la tolleranza."
         ),
         evidence={
             "salary_change_event": record.salary_change_event,
@@ -86,9 +93,9 @@ def outside_historical_range(record: NormalizedRecord) -> RuleEvaluation:
         severity=severity,
         issue_type=IssueType.SALARY_DISCREPANCY,
         message=(
-            f"Gross pay is {pct}% away from the 6-month average."
+            f"La retribuzione è distante del {_pct_label(ratio)}% dalla media a 6 mesi."
             if triggered
-            else "Gross pay is within the 6-month historical range."
+            else "La retribuzione è entro il range storico a 6 mesi."
         ),
         evidence={
             "gross_salary": record.gross_salary,
@@ -114,9 +121,9 @@ def implausible_overtime(record: NormalizedRecord) -> RuleEvaluation:
         severity=severity,
         issue_type=IssueType.OVERTIME_ISSUE,
         message=(
-            f"{hours:.0f} overtime hours is implausible for a standard monthly period."
+            f"{hours:.0f} ore di straordinario sono implausibili per un periodo mensile standard."
             if triggered
-            else "Overtime hours are within the expected range."
+            else "Le ore di straordinario sono nel range atteso."
         ),
         evidence={"overtime_hours": hours, "threshold_hours": 20},
     )
@@ -127,15 +134,16 @@ def unusual_bonus(record: NormalizedRecord) -> RuleEvaluation:
     ratio = bonus / record.gross_salary if record.gross_salary else 0
     triggered = bonus > 0 and (bonus >= 1500 or ratio >= 0.40)
     severity = Severity.HIGH if bonus >= 2000 else Severity.MEDIUM
+    formatted = f"€{bonus:,.0f}".replace(",", ".")
     return RuleEvaluation(
         rule_id="UNUSUAL_BONUS",
         triggered=triggered,
         severity=severity,
         issue_type=IssueType.BONUS_ANOMALY,
         message=(
-            f"Bonus of €{bonus:,.0f} is unusually high relative to gross pay."
+            f"Il bonus di {formatted} è anomalo rispetto alla retribuzione lorda."
             if triggered
-            else "Bonus amount is within expected bounds."
+            else "L'importo del bonus è nei limiti attesi."
         ),
         evidence={
             "bonus_amount": bonus,
@@ -153,9 +161,9 @@ def manual_override(record: NormalizedRecord) -> RuleEvaluation:
         severity=Severity.MEDIUM,
         issue_type=IssueType.MANUAL_OVERRIDE,
         message=(
-            "Record includes a manual override and requires specialist review."
+            "Il record ha un override manuale e richiede la review di uno specialista."
             if triggered
-            else "No manual override flag."
+            else "Nessun flag di override manuale."
         ),
         evidence={"manual_override": record.manual_override},
     )
@@ -169,9 +177,9 @@ def duplicate_record(record: NormalizedRecord) -> RuleEvaluation:
         severity=Severity.CRITICAL,
         issue_type=IssueType.DUPLICATE_RECORD,
         message=(
-            "Duplicate employee/period record in this batch."
+            "Record dipendente/periodo duplicato in questo batch."
             if triggered
-            else "Employee/period combination is unique in this batch."
+            else "La combinazione dipendente/periodo è unica in questo batch."
         ),
         evidence={"duplicate_count": record.duplicate_count},
     )

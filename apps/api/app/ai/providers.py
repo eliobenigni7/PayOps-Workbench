@@ -30,7 +30,7 @@ class DisabledProvider:
     prompt_version = "v0"
 
     def investigate(self, *args, **kwargs) -> dict:
-        raise RuntimeError("AI provider is disabled")
+        raise RuntimeError("Il provider AI è disabilitato")
 
 
 class MockProvider:
@@ -50,47 +50,52 @@ class MockProvider:
         summary_parts: list[str] = []
         rule_ids = {item.rule_id for item in triggered}
 
-        evidence.append(f"Employee {record.employee_id} · {record.team} · period {record.period}.")
+        def eur(value: float) -> str:
+            return f"€{value:,.0f}".replace(",", ".")
+
+        evidence.append(f"Dipendente {record.employee_id} · {record.team} · periodo {record.period}.")
         evidence.extend(item.message for item in triggered)
 
         if "SALARY_VARIATION" in rule_ids or "OUTSIDE_HISTORICAL_RANGE" in rule_ids:
             pct = round((record.salary_delta_ratio or 0) * 100, 1)
+            sign = "+" if pct > 0 else ""
+            pct_label = f"{sign}{str(pct).replace('.', ',')}%"
             summary_parts.append(
-                f"Gross salary moved from €{record.previous_gross_salary:,.0f} to €{record.gross_salary:,.0f} ({pct:+.1f}%) versus the previous period."
+                f"La retribuzione lorda è passata da {eur(record.previous_gross_salary)} a {eur(record.gross_salary)} ({pct_label}) rispetto al periodo precedente."
             )
-            evidence.append(f"6-month average is €{record.avg_6m_gross:,.0f}.")
-            checks.append("Confirm whether a promotion or compensation change was not synced from HR.")
-            checks.append("Check whether a one-off adjustment was coded as base salary.")
+            evidence.append(f"La media a 6 mesi è {eur(record.avg_6m_gross)}.")
+            checks.append("Verificare se una promozione o un cambio retribuzione non è stato allineato da HR.")
+            checks.append("Controllare se un adeguamento una tantum è stato registrato come retribuzione base.")
 
         if "MISSING_SALARY_EVENT" in rule_ids:
-            summary_parts.append("No corresponding salary-change event is present in the provided HR data.")
-            checks.append("Ask People Ops whether the event exists in the HRIS but was dropped from the payroll feed.")
+            summary_parts.append("Nei dati HR forniti non c'è un evento di cambio retribuzione corrispondente.")
+            checks.append("Chiedere a People Ops se l'evento esiste in HRIS ma è caduto nel flusso payroll.")
 
         if "MISSING_IBAN" in rule_ids:
-            summary_parts.append("The record has no IBAN, so the payment cannot be released as-is.")
-            checks.append("Check onboarding completeness and ask the employee to provide bank details through the usual channel.")
+            summary_parts.append("Il record è senza IBAN, quindi il pagamento non può essere disposto così com'è.")
+            checks.append("Verificare la completezza dell'onboarding e chiedere i dati bancari dal canale previsto.")
 
         if "IMPLAUSIBLE_OVERTIME" in rule_ids:
-            summary_parts.append(f"{record.overtime_hours:.0f} overtime hours is outside a normal monthly range.")
-            checks.append("Verify timesheet totals and whether an overtime approval exists.")
+            summary_parts.append(f"{record.overtime_hours:.0f} ore di straordinario sono fuori da un range mensile normale.")
+            checks.append("Verificare i totali timesheet e se esiste un'approvazione dello straordinario.")
 
         if "UNUSUAL_BONUS" in rule_ids:
-            summary_parts.append(f"A bonus of €{record.bonus_amount:,.0f} is large relative to gross pay.")
-            checks.append("Confirm the bonus reason code, plan documentation, or one-off approval.")
+            summary_parts.append(f"Un bonus di {eur(record.bonus_amount)} è elevato rispetto alla retribuzione lorda.")
+            checks.append("Confermare il codice motivo del bonus, la documentazione del piano o l'approvazione una tantum.")
 
         if "MANUAL_OVERRIDE" in rule_ids:
-            summary_parts.append("A manual override is present, so the values should be read as specialist-edited.")
-            checks.append("Read the override note and confirm it is still valid for this period.")
+            summary_parts.append("È presente un override manuale: i valori vanno letti come modificati da uno specialista.")
+            checks.append("Leggere la nota di override e confermare che sia ancora valida per questo periodo.")
 
         if "DUPLICATE_RECORD" in rule_ids:
-            summary_parts.append("This employee appears more than once in the same period, which can create a duplicate payment.")
-            checks.append("Compare both rows and keep only the intended source-system record.")
+            summary_parts.append("Questo dipendente compare più di una volta nello stesso periodo: rischio di doppio pagamento.")
+            checks.append("Confrontare le due righe e tenere solo il record del sistema sorgente corretto.")
 
         if not summary_parts:
-            summary_parts.append(f"{issue_label} was raised by deterministic checks and needs operator review.")
+            summary_parts.append(f"{issue_label} è stata sollevata da controlli deterministici e richiede review dell'operatore.")
 
         if not checks:
-            checks.append("Review the triggered checks and supporting fields before resolving.")
+            checks.append("Rivedere i controlli scattati e i campi a supporto prima di risolvere.")
 
         confidence = min(0.86, 0.52 + 0.08 * len(triggered))
         if "MISSING_SALARY_EVENT" in rule_ids and "SALARY_VARIATION" in rule_ids:
@@ -102,9 +107,9 @@ class MockProvider:
             "suggested_checks": checks,
             "confidence": round(confidence, 2),
             "limitations": [
-                "Only the provided payroll record, history snapshot and HR event flag were used.",
-                "This output does not approve, reject, or change payroll.",
-                "Evidence not present in the case context was not invented.",
+                "Sono stati usati solo il record payroll, lo snapshot storico e il flag evento HR forniti.",
+                "Questo output non approva, non rifiuta e non modifica il payroll.",
+                "Non è stata inventata evidenza assente dal contesto del caso.",
             ],
             "provider": self.provider_name,
             "model": self.model,

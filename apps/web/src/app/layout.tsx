@@ -10,15 +10,15 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Payroll Ops Workbench",
-  description: "Deterministic payroll exception review with human resolution and operations insights.",
+  title: "Payroll Ops — Console operativa",
+  description: "Review deterministica delle eccezioni payroll, con risoluzione umana e analisi operative.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="it">
       <body className={montserrat.variable}>
-        <Suspense fallback={<div className="p-8 text-sm text-ink-500">Loading…</div>}>{children}</Suspense>
+        <Suspense fallback={<div className="p-8 text-sm text-ink-500">Caricamento…</div>}>{children}</Suspense>
       </body>
     </html>
   );

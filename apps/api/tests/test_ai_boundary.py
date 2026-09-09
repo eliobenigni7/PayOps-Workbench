@@ -21,9 +21,9 @@ def test_mock_provider_does_not_invent_or_approve():
     assert "should be approved" not in blob
     assert "payment approved" not in blob
     assert "legal entitlement" not in blob
-    assert "6,140" in draft["summary"] or "6140" in draft["summary"].replace(",", "")
-    assert "no corresponding salary-change event" in draft["summary"].lower()
-    assert any("does not approve" in item.lower() for item in draft["limitations"])
+    assert "6.140" in draft["summary"] or "6140" in draft["summary"].replace(".", "").replace(",", "")
+    assert "non c'è un evento di cambio retribuzione" in draft["summary"].lower()
+    assert any("non approva" in item.lower() for item in draft["limitations"])
 
 
 def test_investigate_does_not_change_exception_status(db):

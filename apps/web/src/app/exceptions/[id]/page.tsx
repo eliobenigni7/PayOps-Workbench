@@ -7,7 +7,8 @@ import { AiPanel } from "@/components/AiPanel";
 import { Badge, PriorityMark } from "@/components/Badge";
 import { ResolutionDrawer } from "@/components/ResolutionDrawer";
 import { api } from "@/lib/api";
-import { formatEur, formatPct, monthLabel, titleCase } from "@/lib/format";
+import { formatEur, formatPct, monthLabel } from "@/lib/format";
+import { AUDIT_LABELS, ACTOR_LABELS, COMPONENT_LABELS, RULE_LABELS, SEVERITY_LABELS, STATUS_LABELS, labelOf, whyPriority } from "@/lib/labels";
 import type { ExceptionDetail, MetaPayload } from "@/lib/types";
 
 function formatValue(value: string | number, format?: string) {
@@ -32,14 +33,14 @@ export default function ExceptionDetailPage() {
 
   if (error) {
     return (
-      <AppShell title="Exception">
+      <AppShell title="Eccezione">
         <p className="text-sm text-[var(--critical)]">{error}</p>
       </AppShell>
     );
   }
   if (!data) {
     return (
-      <AppShell title="Exception">
+      <AppShell title="Eccezione">
         <div className="skeleton h-64 rounded-xl" />
       </AppShell>
     );
@@ -51,12 +52,12 @@ export default function ExceptionDetailPage() {
     <AppShell
       title={data.issue_label}
       subtitle={`${data.employee_id} · ${data.team} · ${monthLabel(data.period)}`}
-      back={{ href: "/exceptions", label: "Review queue" }}
+      back={{ href: "/exceptions", label: "Coda di review" }}
     >
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <PriorityMark priority={data.priority} />
-        <span className="text-sm text-ink-650">Risk {data.risk_score}</span>
-        <Badge tone={data.status === "resolved" ? "success" : "neutral"}>{titleCase(data.status)}</Badge>
+        <span className="text-sm text-ink-650">Rischio {data.risk_score}</span>
+        <Badge tone={data.status === "resolved" ? "success" : "neutral"}>{labelOf(STATUS_LABELS, data.status)}</Badge>
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -74,20 +75,20 @@ export default function ExceptionDetailPage() {
           </dl>
         </section>
         <section className="rounded-xl border border-line bg-white p-5">
-          <h2 className="text-base font-semibold">Why is this {data.priority}?</h2>
-          <p className="mt-1 text-sm text-ink-650">Interpretable priority breakdown. This is not an AI score.</p>
+          <h2 className="text-base font-semibold">{whyPriority(data.priority)}</h2>
+          <p className="mt-1 text-sm text-ink-650">Breakdown interpretabile della priorità. Non è uno score AI.</p>
           <dl className="mt-4 space-y-3">
             {data.priority_breakdown.map((item) => (
               <div key={item.component}>
                 <div className="flex items-baseline justify-between text-sm">
-                  <dt className="font-medium">{titleCase(item.component)}</dt>
+                  <dt className="font-medium">{labelOf(COMPONENT_LABELS, item.component)}</dt>
                   <dd className="font-semibold">+{item.value}</dd>
                 </div>
                 <p className="text-xs text-ink-500">{item.explanation}</p>
               </div>
             ))}
             <div className="flex items-baseline justify-between border-t border-line pt-3 text-sm font-bold">
-              <dt>Total</dt>
+              <dt>Totale</dt>
               <dd>{scoreTotal}</dd>
             </div>
           </dl>
@@ -95,15 +96,15 @@ export default function ExceptionDetailPage() {
       </div>
 
       <section className="mt-4 rounded-xl border border-line bg-white p-5">
-        <h2 className="text-base font-semibold">Triggered checks</h2>
+        <h2 className="text-base font-semibold">Controlli scattati</h2>
         <ul className="mt-3 space-y-2">
           {data.triggered_rules.map((rule) => (
             <li key={rule.rule_id} className="flex items-start gap-3 rounded-lg bg-surface-muted px-3 py-3 text-sm">
               <Badge tone={rule.severity} dot>
-                {titleCase(rule.severity)}
+                {labelOf(SEVERITY_LABELS, rule.severity)}
               </Badge>
               <div>
-                <div className="font-semibold">{rule.rule_id.replaceAll("_", " ")}</div>
+                <div className="font-semibold">{rule.label ?? labelOf(RULE_LABELS, rule.rule_id)}</div>
                 <div className="text-ink-650">{rule.message}</div>
               </div>
             </li>
@@ -112,12 +113,12 @@ export default function ExceptionDetailPage() {
       </section>
 
       <section className="mt-4 rounded-xl border border-line bg-white p-5">
-        <h2 className="text-base font-semibold">Related HR events</h2>
+        <h2 className="text-base font-semibold">Eventi HR correlati</h2>
         <ul className="mt-3 space-y-2 text-sm">
           {data.hr_events.map((event) => (
             <li key={event.type} className="flex items-start justify-between gap-4">
               <span>{event.note}</span>
-              <Badge tone={event.present ? "success" : "critical"}>{event.present ? "Present" : "Missing"}</Badge>
+              <Badge tone={event.present ? "success" : "critical"}>{event.present ? "Presente" : "Mancante"}</Badge>
             </li>
           ))}
         </ul>
@@ -143,7 +144,7 @@ export default function ExceptionDetailPage() {
       </div>
 
       <section className="mt-4 rounded-xl border border-line bg-white p-5">
-        <h2 className="text-base font-semibold">Resolution</h2>
+        <h2 className="text-base font-semibold">Risoluzione</h2>
         {data.resolution ? (
           <p className="mt-3 text-sm text-ink-800">
             {data.resolution.outcome_label} · {data.resolution.reason_label} · {data.resolution.resolved_by}
@@ -152,28 +153,28 @@ export default function ExceptionDetailPage() {
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
             <button className="h-10 rounded-lg bg-ink-950 px-4 text-sm font-semibold text-white" onClick={() => setOutcome("confirm_issue")}>
-              Confirm issue
+              Conferma anomalia
             </button>
             <button className="h-10 rounded-lg border border-line px-4 text-sm font-semibold" onClick={() => setOutcome("mark_expected")}>
-              Mark as expected
+              Segna come atteso
             </button>
             <button className="h-10 rounded-lg border border-line px-4 text-sm font-semibold" onClick={() => setOutcome("request_info")}>
-              Request information
+              Richiedi informazioni
             </button>
             <button className="h-10 rounded-lg border border-[var(--critical)] px-4 text-sm font-semibold text-[var(--critical)]" onClick={() => setOutcome("escalate")}>
-              Escalate
+              Scala
             </button>
           </div>
         )}
       </section>
 
       <section className="mt-4 rounded-xl border border-line bg-white p-5">
-        <h2 className="text-base font-semibold">Audit history</h2>
+        <h2 className="text-base font-semibold">Storico audit</h2>
         <ol className="mt-3 space-y-2 text-sm">
           {data.audit.map((event) => (
             <li key={event.id} className="flex justify-between gap-4">
               <span>
-                {titleCase(event.event_type)} · {event.actor}
+                {labelOf(AUDIT_LABELS, event.event_type)} · {labelOf(ACTOR_LABELS, event.actor)}
               </span>
               <span className="text-ink-500">{event.created_at.replace("T", " ").slice(0, 16)}</span>
             </li>

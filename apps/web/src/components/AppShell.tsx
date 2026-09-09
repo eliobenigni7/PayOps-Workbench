@@ -11,10 +11,10 @@ import {
 } from "lucide-react";
 
 const NAV = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
-  { href: "/exceptions", label: "Review queue", icon: ListChecks, countKey: "openCount" as const },
-  { href: "/insights", label: "Insights", icon: CircleAlert },
-  { href: "/improvements", label: "Improvements", icon: Lightbulb, countKey: "improvementCount" as const },
+  { href: "/", label: "Panoramica", icon: LayoutDashboard },
+  { href: "/exceptions", label: "Coda di review", icon: ListChecks, countKey: "openCount" as const },
+  { href: "/insights", label: "Analisi", icon: CircleAlert },
+  { href: "/improvements", label: "Miglioramenti", icon: Lightbulb, countKey: "improvementCount" as const },
 ];
 
 type AppShellProps = {
@@ -50,7 +50,7 @@ export function AppShell({
           <div>
             <div className="text-sm font-semibold leading-tight">Payroll Ops</div>
             <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
-              Workbench
+              Console operativa
             </div>
           </div>
         </div>
@@ -84,10 +84,10 @@ export function AppShell({
         <div className="border-t border-line px-5 py-4">
           <div className="flex items-center gap-2 text-sm text-ink-500">
             <Settings size={16} strokeWidth={1.85} />
-            Settings
+            Impostazioni
           </div>
           <p className="mt-3 text-[11px] leading-relaxed text-ink-500">
-            Synthetic demo data. Rules are deterministic. AI cannot resolve payroll.
+            Dati demo sintetici. Le regole sono deterministiche. L&apos;AI non può risolvere il payroll.
           </p>
         </div>
       </aside>

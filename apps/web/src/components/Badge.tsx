@@ -28,5 +28,6 @@ export function Badge({
 }
 
 export function PriorityMark({ priority }: { priority: Priority }) {
-  return <Badge tone={priority} dot>{priority[0].toUpperCase() + priority.slice(1)}</Badge>;
+  const labels = { critical: "Critico", high: "Alto", medium: "Medio", low: "Basso" };
+  return <Badge tone={priority} dot>{labels[priority]}</Badge>;
 }

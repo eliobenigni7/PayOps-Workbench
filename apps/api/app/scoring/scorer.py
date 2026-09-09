@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.domain.enums import ISSUE_LABELS, SEVERITY_RANK, IssueType, Priority, Routing, Severity
+from app.domain.enums import ISSUE_LABELS, RULE_LABELS, SEVERITY_LABELS, SEVERITY_RANK, IssueType, Priority, Routing, Severity
 from app.domain.types import NormalizedRecord, PriorityComponent, RoutingDecision, RuleEvaluation
 
 SEVERITY_POINTS = {
@@ -98,25 +98,25 @@ def score_record(record: NormalizedRecord, evaluations: list[RuleEvaluation]) ->
         PriorityComponent(
             component="severity",
             value=severity_pts,
-            explanation=f"Highest triggered check is {highest.rule_id.replace('_', ' ').title()} ({highest.severity}).",
+            explanation=f"Il controllo con gravità più alta è {RULE_LABELS.get(highest.rule_id, highest.rule_id)} ({SEVERITY_LABELS[highest.severity]}).",
         ),
         PriorityComponent(
             component="financial_exposure",
             value=exposure_pts,
-            explanation=f"Estimated at-risk amount is €{exposure:,.0f}.",
+            explanation=f"L'importo a rischio stimato è €{exposure:,.0f}.".replace(",", "."),
         ),
         PriorityComponent(
             component="rule_confidence",
             value=confidence_pts,
-            explanation="Deterministic checks with clear thresholds; confidence rises when multiple rules agree.",
+            explanation="Controlli deterministici con soglie esplicite; la confidenza sale quando più regole concordano.",
         ),
         PriorityComponent(
             component="missing_support_event",
             value=missing_pts,
             explanation=(
-                "No supporting HR event was found for a material pay change."
+                "Nessun evento HR a supporto di una variazione retributiva rilevante."
                 if missing_pts
-                else "No missing supporting-event penalty applied."
+                else "Nessuna penalità per evento di supporto mancante."
             ),
         ),
     ]

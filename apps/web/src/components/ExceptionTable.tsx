@@ -16,9 +16,9 @@ export function ExceptionTable({
   if (rows.length === 0) {
     return (
       <div className="rounded-xl border border-line bg-white px-6 py-16 text-center">
-        <h2 className="text-lg font-semibold">No cases need review</h2>
+        <h2 className="text-lg font-semibold">Nessun caso da rivedere</h2>
         <p className="mt-2 text-sm text-ink-650">
-          Everything in this view passed the current validation rules or was already resolved.
+          Tutto in questa vista ha superato le regole di validazione attuali o è già stato risolto.
         </p>
       </div>
     );
@@ -29,13 +29,13 @@ export function ExceptionTable({
       <table className="w-full text-left text-[13px]">
         <thead className="border-b border-line bg-surface-muted text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500">
           <tr>
-            <th className="px-4 py-3">Priority</th>
-            <th className="px-4 py-3">Employee</th>
-            <th className="px-4 py-3">Issue</th>
-            <th className="px-4 py-3">Risk</th>
-            <th className="px-4 py-3">Exposure</th>
-            <th className="px-4 py-3">Age</th>
-            <th className="px-4 py-3">Assignee</th>
+            <th className="px-4 py-3">Priorità</th>
+            <th className="px-4 py-3">Dipendente</th>
+            <th className="px-4 py-3">Problema</th>
+            <th className="px-4 py-3">Rischio</th>
+            <th className="px-4 py-3">Esposizione</th>
+            <th className="px-4 py-3">Anzianità</th>
+            <th className="px-4 py-3">Assegnatario</th>
             <th className="px-4 py-3" />
           </tr>
         </thead>
@@ -57,7 +57,7 @@ export function ExceptionTable({
                 <div className="flex items-center gap-2">
                   <span>{row.issue_label}</span>
                   {row.has_ai_investigation ? (
-                    <Sparkle size={14} className="text-ink-500" aria-label="AI explanation available" />
+                    <Sparkle size={14} className="text-ink-500" aria-label="Spiegazione AI disponibile" />
                   ) : null}
                 </div>
               </td>
@@ -69,7 +69,7 @@ export function ExceptionTable({
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-[11px] font-semibold">
                     {initials(row.assigned_to)}
                   </span>
-                  <span className="text-ink-650">{row.assigned_to ?? "Unassigned"}</span>
+                  <span className="text-ink-650">{row.assigned_to ?? "Non assegnato"}</span>
                 </div>
               </td>
               <td className="px-4 py-3 text-right">
@@ -77,7 +77,7 @@ export function ExceptionTable({
                   href={`/exceptions/${row.id}${batchId ? `?batch=${batchId}` : ""}`}
                   className="text-sm font-semibold text-ink-950"
                 >
-                  Open
+                  Apri
                 </Link>
               </td>
             </tr>

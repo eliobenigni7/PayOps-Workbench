@@ -168,7 +168,7 @@ def insights_payload(db: Session, batch: Batch | None = None) -> dict:
     return {
         "batch_id": batch.id,
         "period": batch.period,
-        "hero_question": "Where are we spending avoidable manual effort?",
+        "hero_question": "Dove stiamo spendendo effort manuale evitabile?",
         "processed": counts["processed"],
         "auto_cleared": counts["auto_cleared"],
         "needs_review": counts["needs_review"],
@@ -180,7 +180,7 @@ def insights_payload(db: Session, batch: Batch | None = None) -> dict:
         "critical_delta": (counts["critical_all"] - (prev_counts["critical_all"] if prev_counts else counts["critical_all"])),
         "methodology": {
             "baseline_review_seconds": BASELINE_REVIEW_SECONDS,
-            "note": "Time-saved figures are scenario assumptions from the synthetic demo, not measured payroll outcomes.",
+            "note": "I valori di tempo risparmiato sono assunzioni di scenario del demo sintetico, non esiti payroll misurati.",
         },
     }
 

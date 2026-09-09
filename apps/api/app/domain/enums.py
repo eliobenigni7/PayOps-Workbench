@@ -73,33 +73,57 @@ class ImplementationEffort(StrEnum):
 
 
 ISSUE_LABELS: dict[IssueType, str] = {
-    IssueType.MISSING_BANK_INFORMATION: "Missing bank information",
-    IssueType.SALARY_DISCREPANCY: "Salary anomaly",
-    IssueType.MISSING_HR_EVENT: "Missing HR event",
-    IssueType.OVERTIME_ISSUE: "Implausible overtime",
-    IssueType.BONUS_ANOMALY: "Bonus anomaly",
-    IssueType.MANUAL_OVERRIDE: "Manual override",
-    IssueType.DUPLICATE_RECORD: "Duplicate record",
+    IssueType.MISSING_BANK_INFORMATION: "IBAN mancante",
+    IssueType.SALARY_DISCREPANCY: "Anomalia retributiva",
+    IssueType.MISSING_HR_EVENT: "Evento HR mancante",
+    IssueType.OVERTIME_ISSUE: "Straordinario implausibile",
+    IssueType.BONUS_ANOMALY: "Anomalia sul bonus",
+    IssueType.MANUAL_OVERRIDE: "Override manuale",
+    IssueType.DUPLICATE_RECORD: "Record duplicato",
 }
 
 REASON_LABELS: dict[ReasonCode, str] = {
-    ReasonCode.SALARY_INCREASE: "Salary increase",
-    ReasonCode.ONE_OFF_BONUS: "One-off bonus",
-    ReasonCode.MANUAL_ADJUSTMENT: "Manual adjustment",
-    ReasonCode.DATA_CORRECTION: "Data correction",
-    ReasonCode.MISSING_SOURCE_DATA: "Missing source data",
-    ReasonCode.PROCESS_GAP: "Process gap",
-    ReasonCode.DUPLICATE_PAYMENT: "Duplicate payment",
-    ReasonCode.LEGITIMATE_OVERTIME: "Legitimate overtime",
-    ReasonCode.ONBOARDING_INCOMPLETE: "Onboarding incomplete",
-    ReasonCode.OTHER: "Other",
+    ReasonCode.SALARY_INCREASE: "Aumento retributivo",
+    ReasonCode.ONE_OFF_BONUS: "Bonus una tantum",
+    ReasonCode.MANUAL_ADJUSTMENT: "Rettifica manuale",
+    ReasonCode.DATA_CORRECTION: "Correzione dati",
+    ReasonCode.MISSING_SOURCE_DATA: "Dato sorgente mancante",
+    ReasonCode.PROCESS_GAP: "Gap di processo",
+    ReasonCode.DUPLICATE_PAYMENT: "Pagamento duplicato",
+    ReasonCode.LEGITIMATE_OVERTIME: "Straordinario legittimo",
+    ReasonCode.ONBOARDING_INCOMPLETE: "Onboarding incompleto",
+    ReasonCode.OTHER: "Altro",
 }
 
 OUTCOME_LABELS: dict[ResolutionOutcome, str] = {
-    ResolutionOutcome.CONFIRM_ISSUE: "Confirm issue",
-    ResolutionOutcome.MARK_EXPECTED: "Mark as expected",
-    ResolutionOutcome.REQUEST_INFO: "Request information",
-    ResolutionOutcome.ESCALATE: "Escalate",
+    ResolutionOutcome.CONFIRM_ISSUE: "Conferma anomalia",
+    ResolutionOutcome.MARK_EXPECTED: "Segna come atteso",
+    ResolutionOutcome.REQUEST_INFO: "Richiedi informazioni",
+    ResolutionOutcome.ESCALATE: "Scala",
+}
+
+SEVERITY_LABELS = {
+    Severity.CRITICAL: "critico",
+    Severity.HIGH: "alto",
+    Severity.MEDIUM: "medio",
+    Severity.LOW: "basso",
+}
+
+RULE_LABELS = {
+    "MISSING_IBAN": "IBAN mancante",
+    "SALARY_VARIATION": "Variazione retribuzione",
+    "MISSING_SALARY_EVENT": "Evento retribuzione mancante",
+    "OUTSIDE_HISTORICAL_RANGE": "Fuori range storico",
+    "IMPLAUSIBLE_OVERTIME": "Straordinario implausibile",
+    "UNUSUAL_BONUS": "Bonus anomalo",
+    "MANUAL_OVERRIDE": "Override manuale",
+    "DUPLICATE_RECORD": "Record duplicato",
+}
+
+EFFORT_LABELS = {
+    "low": "basso",
+    "medium": "medio",
+    "high": "alto",
 }
 
 SEVERITY_RANK = {

@@ -24,24 +24,24 @@ LAST = [
     "Colombo", "Martini", "Gentile", "Barone", "Leone", "Mancini", "Santoro", "Farina", "Coppola", "Serra",
 ]
 TEAMS = [
-    "Sales", "Operations", "Engineering", "Marketing", "Finance", "People",
-    "Customer Success", "Legal", "Product", "Support",
+    "Vendite", "Operazioni", "Ingegneria", "Marketing", "Amministrazione", "People",
+    "Customer Success", "Legale", "Product", "Supporto",
 ]
 BASE_SALARIES = [2800, 2940, 3040, 3100, 3210, 3380, 3520, 3680, 3860, 4100, 4320, 4480, 4650, 4920, 5100]
 
 HERO_NAMES = {
-    1001: ("Giulia Ferri", "Sales"),
-    1002: ("Luca Conti", "Operations"),
+    1001: ("Giulia Ferri", "Vendite"),
+    1002: ("Luca Conti", "Operazioni"),
     1004: ("Marco Villa", "Marketing"),
-    1005: ("Elena Moretti", "Finance"),
-    1006: ("Andrea Greco", "Sales"),
+    1005: ("Elena Moretti", "Amministrazione"),
+    1006: ("Andrea Greco", "Vendite"),
     1007: ("Chiara Riva", "People"),
-    1008: ("Matteo Sala", "Engineering"),
-    1009: ("Francesca Gallo", "Operations"),
+    1008: ("Matteo Sala", "Ingegneria"),
+    1009: ("Francesca Gallo", "Operazioni"),
     1010: ("Davide Bruno", "Customer Success"),
-    1011: ("Alessia Marchetti", "Operations"),
-    1012: ("Stefano Caruso", "Engineering"),
-    1042: ("Sara Romano", "Engineering"),
+    1011: ("Alessia Marchetti", "Operazioni"),
+    1012: ("Stefano Caruso", "Ingegneria"),
+    1042: ("Sara Romano", "Ingegneria"),
 }
 
 
@@ -254,7 +254,7 @@ def _resolve_historical(db: Session, batch: Batch, rng: random.Random, resolved_
             exception_id=case.id,
             outcome=outcome.value,
             reason_code=reason.value,
-            note="Seeded historical resolution for the demo insights window.",
+            note="Risoluzione storica seedata per la finestra Insights del demo.",
             resolved_by=rng.choice(OPERATORS),
             resolved_at=resolved_at - timedelta(minutes=rng.randrange(30, 4000)),
             handling_minutes=minutes,
