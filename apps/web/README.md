@@ -1,14 +1,11 @@
 # Web App
 
-Target: Next.js + TypeScript.
+Next.js UI for Payroll Ops Workbench.
 
-Implement the routes and UI defined in `../../DESIGN.md` and `../../ARCHITECTURE.md`.
+```bash
+cd apps/web
+npm install
+npm run dev
+```
 
-Recommended order:
-
-1. build static routes using fixtures;
-2. extract design-system primitives;
-3. implement table/filter state;
-4. connect API only after the static product experience is strong.
-
-Do not start by building authentication, settings pages or a generic component library.
+The UI expects the API at `http://localhost:8000`. Override with `NEXT_PUBLIC_API_BASE`.

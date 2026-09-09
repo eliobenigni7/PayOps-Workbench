@@ -1,0 +1,47 @@
+@import url("../styles/tokens.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Montserrat", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--surface-app);
+  color: var(--ink-950);
+  font-family: var(--font-sans);
+}
+
+body {
+  min-height: 100vh;
+}
+
+* {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink-950);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--brand-lime);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-muted) 25%, #fafaf7 37%, var(--surface-muted) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

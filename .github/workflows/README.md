@@ -1,9 +1,6 @@
-# CI placeholder
+# CI
 
-When implementation starts, add one CI workflow that runs:
+GitHub Actions runs:
 
-- frontend typecheck/lint/tests;
-- backend lint/tests;
-- deterministic rule regression tests.
-
-Do not add deployment automation until there is a deployment target.
+- backend `pytest`, including deterministic rule and scoring regressions;
+- frontend `tsc --noEmit`.
