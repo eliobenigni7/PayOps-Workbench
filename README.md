@@ -1,16 +1,12 @@
 # Payroll Ops Workbench
 
-A focused **Operations Excellence prototype** for high-volume payroll operations.
-
-The core idea is simple:
+A focused **Operations Excellence** prototype for high-volume payroll operations.
 
 > **Do not automate judgment. Automate the path that decides what deserves human attention.**
 
-A payroll team should not manually inspect 1,000 records if 930 are clean. The system should automatically clear deterministic, low-risk cases; surface the exceptions that matter; explain why they were surfaced; capture the operator's resolution; and turn recurring exceptions into process-improvement opportunities.
+A payroll team should not inspect 1,000 records if 930 are clean. The workbench automatically clears deterministic low-risk cases, surfaces the exceptions that matter, explains why they were queued, captures the operator's resolution, and turns recurring exceptions into upstream process fixes.
 
-This repository is intentionally an **implementation scaffold**, not a finished application. It is designed to be handed to a coding agent or used as the starting point for a small, polished portfolio project.
-
-> **Important:** all data and rules in this repository are synthetic. The project does not calculate statutory payroll, taxes, contributions, legal entitlements, or compliance decisions.
+**All data and rules are synthetic.** This project does not calculate statutory payroll, taxes, contributions, legal entitlements, or compliance decisions.
 
 ---
 
@@ -20,8 +16,6 @@ High-volume operational teams usually suffer from two different problems:
 
 1. too much repetitive review work;
 2. the same exceptions recurring because nobody turns queue data into upstream process fixes.
-
-Payroll Ops Workbench attacks both.
 
 ```mermaid
 flowchart LR
@@ -46,183 +40,105 @@ The important loop is not `AI -> payroll`. It is:
 
 ---
 
-## What the final demo should contain
+## Run the demo
 
-### 1. Operations Control Center
-A compact home screen showing:
+```bash
+# API
+cd apps/api
+python3 -m pip install -r requirements.txt
+python3 -m uvicorn app.main:app --reload --port 8000
 
-- records processed;
-- auto-clear rate;
-- cases requiring review;
-- critical exceptions;
-- estimated manual effort avoided;
-- exception trend;
-- top recurring causes.
+# Web
+cd apps/web
+npm install
+npm run dev
+```
 
-### 2. Exception Queue
-A dense, useful operational table with:
+Open [http://localhost:3000](http://localhost:3000).
 
-- priority;
-- employee / record identifier;
-- issue;
-- risk score;
-- financial exposure;
-- age / SLA;
-- assignee;
-- AI explanation availability.
+One-command alternative:
 
-The queue is the heart of the product.
+```bash
+docker compose up --build
+```
 
-### 3. Exception Detail
-The operator sees:
+The first API boot seeds a synthetic September 2026 batch: **1,284 records**, **1,191 auto-cleared**, **93 in review**.
 
-- current value vs expected / historical context;
-- deterministic rules triggered;
-- interpretable priority breakdown;
-- related HR events;
-- AI-generated explanation and suggested checks;
-- resolution actions;
-- audit history.
+### Tests
 
-### 4. Resolution Workflow
-Only a human can resolve a case:
-
-- Confirm issue
-- Mark as expected
-- Request information
-- Escalate
-
-Every resolution requires a structured reason code.
-
-### 5. Operations Insights
-Aggregate resolved cases to answer:
-
-- What creates the most manual work?
-- Which exception types are increasing?
-- Which rules are noisy?
-- Which teams/processes generate recurring friction?
-- Where would an upstream process change save the most time?
-
-### 6. Improvement Opportunities
-Turn recurring patterns into actionable mini business cases:
-
-- problem;
-- root-cause hypothesis;
-- monthly occurrences;
-- handling time;
-- estimated effort wasted;
-- suggested intervention;
-- implementation effort;
-- expected ROI;
-- KPI to monitor after release.
+```bash
+cd apps/api && python3 -m pytest -q
+cd apps/web && npm run typecheck
+```
 
 ---
 
-## Deliberate AI boundary
+## What to click in 90 seconds
 
-AI is useful only where ambiguity exists.
+1. **Operations Control Center** — most of the batch is auto-cleared; 93 cases still need a person.
+2. **Review queue** — sort/filter to critical and open `EMP-1042`.
+3. **Exception detail** — salary moved +42% with no HR event; the score breakdown is deterministic.
+4. Optional: **Ask for investigation**. AI summarizes evidence and cannot resolve the case.
+5. **Mark as expected** with reason `Salary increase`.
+6. **Insights** — missing bank information is the largest source of avoidable effort.
+7. Open the **improvement opportunity** and read the upstream onboarding fix.
 
-It may:
+---
 
-- explain why a case is unusual in plain language;
-- summarize relevant evidence;
-- identify related events in provided context;
-- suggest what an operator should verify next;
-- draft an improvement proposal from structured aggregate data.
+## Why AI is not autonomous here
 
-It may **not**:
+AI may explain triggered checks, summarize provided evidence, suggest the next verification, and draft improvement prose.
 
-- approve payroll;
-- auto-resolve a case;
-- mutate source records;
-- override deterministic controls;
-- invent missing evidence;
-- present legal/payroll advice as fact.
+AI may **not** approve payroll, resolve a case, edit source records, override deterministic rules, or invent missing evidence.
+
+The AI service has no method that can change exception state. The product remains useful with `AI_PROVIDER=disabled`.
 
 See [`docs/AI_GUARDRAILS.md`](docs/AI_GUARDRAILS.md).
 
 ---
 
-## Proposed stack
+## Architecture
 
-Keep the implementation deliberately boring.
+Modular monolith. No microservices, no vector database, no workflow engine.
 
-| Layer | Choice | Why |
-|---|---|---|
-| Web | Next.js + TypeScript | Fast product iteration, excellent table/detail UX |
-| API | FastAPI + Python | Natural home for rules, scoring and data processing |
-| Persistence | SQLite for demo | Zero operational overhead |
-| Styling | CSS variables + Tailwind or CSS modules | Easy implementation of the design system |
-| AI | Provider adapter behind one interface | Swap models; keep domain logic independent |
-| Local runtime | Docker Compose | One command demo without infrastructure theatre |
-
-Do **not** introduce microservices, Kafka, Kubernetes, a vector database, or a workflow engine unless a concrete requirement appears.
-
----
-
-## Repository map
+| Layer | Choice |
+|---|---|
+| Web | Next.js + TypeScript |
+| API | FastAPI + Python |
+| Persistence | SQLite |
+| AI | Provider adapter (`mock` by default) |
 
 ```text
-.
-├── README.md
-├── DESIGN.md                 # Jet HR-inspired visual system
-├── AGENTS.md                 # coding-agent implementation brief
-├── ARCHITECTURE.md
-├── PRODUCT.md
-├── IMPLEMENTATION_PLAN.md
-├── .env.example
-├── .gitignore
-├── apps/
-│   ├── web/
-│   │   ├── README.md
-│   │   └── src/styles/tokens.css
-│   └── api/
-│       └── README.md
-├── packages/domain/
-│   └── SCHEMA.md
-├── data/
-│   ├── sample_payroll_batch.csv
-│   └── DATA_DICTIONARY.md
-├── docs/
-│   ├── USER_FLOWS.md
-│   ├── AI_GUARDRAILS.md
-│   ├── METRICS.md
-│   ├── DECISIONS.md
-│   └── DEMO_SCRIPT.md
-└── .github/workflows/
-    └── README.md
+apps/web     Operations Control Center, queue, detail, insights, improvements
+apps/api     import → rules → scoring → resolution → insights
 ```
-
----
-
-## Suggested demo story
-
-Do not demo the app feature-by-feature. Demo one operational story.
-
-1. A batch of 1,284 payroll records lands.
-2. 1,191 are auto-cleared by deterministic checks.
-3. 93 enter the review queue.
-4. The operator opens a critical salary-change anomaly.
-5. The app explains *why* it is critical and shows evidence.
-6. AI suggests checking for a missing salary-change event, but does not decide.
-7. The operator marks the case as expected with a structured reason.
-8. Insights show that missing upstream data creates 37% of monthly review effort.
-9. The app proposes an onboarding validation as a low-effort/high-impact process fix.
-
-The product story is therefore not **"AI finds payroll errors."**
-
-It is **"structured operations data tells us where human attention is needed and where the process itself should change."**
 
 ---
 
 ## Design
 
-The visual direction is documented in [`DESIGN.md`](DESIGN.md). It is **inspired by Jet HR's public product/brand language**, but it does not include or redistribute Jet HR proprietary assets and is not presented as an official Jet HR interface.
+Light, high-trust UI with a Jet HR-inspired lime accent. Tables stay dense. The AI panel is secondary to evidence.
+
+See [`DESIGN.md`](DESIGN.md). This is an independent portfolio prototype and is not an official Jet HR product.
+
+---
+
+## Screenshots
+
+The UI is designed at 1440×900. Images below are captured from the running seeded demo.
+
+![Operations Control Center](docs/screenshots/control_center.png)
+
+![Review queue](docs/screenshots/review_queue.png)
+
+![Critical exception detail](docs/screenshots/exception_detail.png)
+
+![Insights](docs/screenshots/insights.png)
+
+![Improvement opportunity](docs/screenshots/improvement_opportunity.png)
 
 ---
 
 ## Status
 
-**Scaffold / pre-implementation.**
-
-Recommended first implementation milestone: a fully polished static UI with seeded data before writing the backend. The portfolio value comes from showing product judgment and operational clarity, not infrastructure complexity.
+**Working MVP.** Deterministic detection, human resolution, insights, and improvement opportunities are implemented against a seeded synthetic dataset.
