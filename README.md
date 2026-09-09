@@ -10,7 +10,7 @@ Costruito come showcase per **Operations Excellence @ Jet HR**. Non è un prodot
 
 ---
 
-## Demo — 57 secondi
+## Demo
 
 <p align="center">
   <a href="docs/demo/payroll_ops_workbench_demo.mp4">
